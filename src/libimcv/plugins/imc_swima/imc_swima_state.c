@@ -65,6 +65,17 @@ struct private_imc_swima_state_t {
 	 * PA-TNC attribute segmentation contracts associated with TNCCS connection
 	 */
 	seg_contract_manager_t *contracts;
+
+	/**
+	 * Has a subscription been established?
+	 */
+	bool subscription;
+
+	/**
+	 * SWIMA Request ID
+	 */
+	uint32_t request_id;
+
 };
 
 METHOD(imc_state_t, get_connection_id, TNC_ConnectionID,
@@ -141,6 +152,23 @@ METHOD(imc_state_t, destroy, void,
 	free(this);
 }
 
+METHOD(imc_swima_state_t, set_subscription, void,
+	private_imc_swima_state_t *this, uint32_t request_id, bool set)
+{
+	this->request_id = request_id;
+	this->subscription = set;
+}
+
+METHOD(imc_swima_state_t, get_subscription, bool,
+	private_imc_swima_state_t *this, uint32_t *request_id)
+{
+	if (request_id)
+	{
+		*request_id = this->request_id;
+	}
+	return this->subscription;
+}
+
 /**
  * Described in header.
  */
@@ -163,13 +191,15 @@ imc_state_t *imc_swima_state_create(TNC_ConnectionID connection_id)
 				.get_result = _get_result,
 				.destroy = _destroy,
 			},
+			.set_subscription = _set_subscription,
+			.get_subscription = _get_subscription,
 		},
 		.state = TNC_CONNECTION_STATE_CREATE,
 		.result = TNC_IMV_EVALUATION_RESULT_DONT_KNOW,
 		.connection_id = connection_id,
 		.contracts = seg_contract_manager_create(),
 	);
-	
+
 	return &this->public.interface;
 }
 

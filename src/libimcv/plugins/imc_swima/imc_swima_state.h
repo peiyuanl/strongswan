@@ -39,6 +39,22 @@ struct imc_swima_state_t {
 	 */
 	imc_state_t interface;
 
+	/**
+	 * Set or clear a subscription
+	 *
+	 * @param request_id	SWIM Request ID
+	 * @param set			TRUE sets and FALSE clears a subscripton
+	 */
+	void (*set_subscription)(imc_swima_state_t *this, uint32_t request_id,
+							 bool set);
+
+	/**
+	 * Get the subscription status
+	 *
+	 * @param request_id	SWIMA request ID
+	 * @return				TRUE if subscription is set
+	 */
+	bool (*get_subscription)(imc_swima_state_t *this, uint32_t *request_id);
 };
 
 /**
